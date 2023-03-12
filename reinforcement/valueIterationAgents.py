@@ -64,6 +64,25 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
 
 
+        for copy_value in range (self.iterations): # for all iterations
+            copy_value = util.Counter()
+            for this_state in self.mdp.getStates(): # for all states in this iteration
+                qValueArray = []
+                for this_action in self.mdp.getPossibleActions(this_state):
+                    if not self.mdp.isTerminal(this_state):
+                        qValueArray.append(self.getQValue(this_state, this_action))
+                        largestQValue = qValueArray[0]
+                    for x in qValueArray:
+                        if x > largestQValue:
+                            largestQValue = x
+                    copy_value[this_state] = largestQValue
+                # else:
+                #     print("reached terminal state")
+
+            for this_state in copy_value:
+                self.values[this_state] = copy_value[this_state]
+
+
     def getValue(self, state):
         """
           Return the value of the state (computed in __init__).
@@ -77,6 +96,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+
         util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
@@ -89,6 +109,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+
         util.raiseNotDefined()
 
     def getPolicy(self, state):
