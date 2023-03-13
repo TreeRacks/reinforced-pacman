@@ -64,11 +64,11 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
 
 
-        for copy_value in range (self.iterations): # for all iterations
+        for copy_value in range(self.iterations): # for all iterations
             copy_value = util.Counter()
             for this_state in self.mdp.getStates(): # for all states in this iteration
                 qValueArray = []
-                for this_action in self.mdp.getPossibleActions(this_state):
+                for this_action in self.mdp.getPossibleActions(this_state): # for all valid actions in this state
                     if not self.mdp.isTerminal(this_state):
                         qValueArray.append(self.getQValue(this_state, this_action))
                         largestQValue = qValueArray[0]
@@ -96,7 +96,17 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+        if self.mdp.isTerminal(state):
+            return None
+        transition = self.mdp.getTransitionStatesAndProbs(state, action)
+        # transition[0] = state
+        # transition[1] = probability
+        q = 0
+        for this_transition in transition:
+            this_reward = self.mdp.getReward(state, action, this_transition[0])
+            q = q + this_transition[1] * (this_reward + (self.discount * self.values[this_transition[0]]))
 
+        return q
         util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
@@ -109,6 +119,16 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+
+        highestQValue = float('-inf')
+        if self.mdp.isTerminal(state):
+            return None
+        for this_action in self.mdp.getPossibleActions(state):
+            this_QValue = self.getQValue(state, this_action)
+            if this_QValue > highestQValue:
+                highestQValue = this_QValue
+                highestQValueAction = this_action
+        return highestQValueAction
 
         util.raiseNotDefined()
 
