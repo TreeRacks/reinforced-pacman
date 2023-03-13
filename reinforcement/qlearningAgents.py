@@ -41,7 +41,7 @@ class QLearningAgent(ReinforcementAgent):
     def __init__(self, **args):
         "You can initialize Q-values here..."
         ReinforcementAgent.__init__(self, **args)
-
+        self.QValue = util.Counter()
         "*** YOUR CODE HERE ***"
 
     def getQValue(self, state, action):
@@ -51,6 +51,8 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
+
+        return self.QValue[state, action]
         util.raiseNotDefined()
 
 
@@ -62,6 +64,19 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
+        QValueArray = []
+        for action in self.getLegalActions(state):
+            QValueArray.append(self.getQValue(state, action))
+        if not QValueArray:
+            return 0.0
+        else:
+            highestQValueAction = QValueArray[0]
+            for x in QValueArray:
+                if x > highestQValueAction:
+                    highestQValueAction = x
+            return highestQValueAction
+
+
         util.raiseNotDefined()
 
     def computeActionFromQValues(self, state):
@@ -71,6 +86,13 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
+
+        if not self.getLegalActions(state):
+            return None
+        for action in self.getLegalActions(state):
+            if self.getQValue(state, action) is self.computeValueFromQValues(state):
+                return action
+
         util.raiseNotDefined()
 
     def getAction(self, state):
@@ -102,7 +124,13 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        this_sample = reward + (self.discount * self.getValue((nextState)))
+        updatedQ = (1 - self.alpha) * self.getQValue(state, action)
+        updatedQ = updatedQ + (self.alpha * this_sample)
+
+        self.QValue[state, action] = updatedQ
+
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
